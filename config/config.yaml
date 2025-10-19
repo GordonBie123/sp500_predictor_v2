@@ -1,0 +1,68 @@
+# config/config.yaml
+project:
+  name: "stock-predictor-v2"
+  version: "2.0.0"
+  random_seed: 42
+
+data:
+  # 1 year of trading days
+  lookback_days: 252
+  # Predict 5 days ahead
+  prediction_horizon: 5 
+  train_test_split: 0.8
+  validation_split: 0.1
+  
+  # Data sources
+  sources:
+    stock_data: "yfinance"
+    news_data: "newsapi"
+    fundamental_data: "yfinance"
+  
+  # Caching
+  cache:
+    enabled: true
+    directory: "data/cache"
+    ttl_hours: 24
+
+features:
+  technical:
+    - name: "sma"
+      windows: [10, 20, 50, 200]
+    - name: "ema"
+      windows: [12, 26]
+    - name: "rsi"
+      period: 14
+    - name: "macd"
+      fast: 12
+      slow: 26
+      signal: 9
+    - name: "bollinger_bands"
+      period: 20
+      std: 2
+    - name: "atr"
+      period: 14
+  
+  sentiment:
+    news_lookback_days: 7
+    decay_rate: 0.1
+    min_articles: 5
+  
+  regime:
+    volatility_window: 30
+    trend_window: 50
+
+training:
+  batch_size: 32
+  epochs: 100
+  early_stopping_patience: 15
+  learning_rate: 0.001
+  
+  validation:
+    method: "walk_forward"
+    n_splits: 5
+    gap_days: 5
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/stock_predictor.log"
